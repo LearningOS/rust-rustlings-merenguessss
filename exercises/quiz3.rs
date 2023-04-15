@@ -14,7 +14,9 @@
 
 // Execute `rustlings hint quiz3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+pub trait Card{
+    fn print(&self) -> String;
+}
 
 pub struct ReportCard {
     pub grade: f32,
@@ -22,12 +24,40 @@ pub struct ReportCard {
     pub student_age: u8,
 }
 
-impl ReportCard {
-    pub fn print(&self) -> String {
+impl Card for ReportCard {
+    fn print(&self) -> String {
         format!("{} ({}) - achieved a grade of {}",
-            &self.student_name, &self.student_age, &self.grade)
+                &self.student_name, &self.student_age, &self.grade)
     }
 }
+
+impl ReportCard{
+    pub fn to_grade(&self) -> ReportGradeCard{
+        let mut res = ReportGradeCard{student_name:self.student_name.clone(),student_age:self.student_age,grade:String::new()};
+        if self.grade < 1.5{
+            res.grade = String::from("A+")
+        }
+        res
+    }
+}
+
+pub struct ReportGradeCard{
+    pub grade: String,
+    pub student_name: String,
+    pub student_age: u8,
+}
+
+impl Card for ReportGradeCard {
+    fn print(&self) -> String {
+        format!("{} ({}) - achieved a grade of {}",
+                &self.student_name, &self.student_age, &self.grade)
+    }
+}
+
+fn print(card :&impl Card) -> String{
+    card.print()
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -41,21 +71,20 @@ mod tests {
             student_age: 12,
         };
         assert_eq!(
-            report_card.print(),
+            print(&report_card),
             "Tom Wriggle (12) - achieved a grade of 2.1"
         );
     }
 
     #[test]
     fn generate_alphabetic_report_card() {
-        // TODO: Make sure to change the grade here after you finish the exercise.
         let report_card = ReportCard {
-            grade: 2.1,
+            grade: 1.1,
             student_name: "Gary Plotter".to_string(),
             student_age: 11,
         };
         assert_eq!(
-            report_card.print(),
+            print(&report_card.to_grade()),
             "Gary Plotter (11) - achieved a grade of A+"
         );
     }
